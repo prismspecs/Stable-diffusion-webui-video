@@ -294,22 +294,14 @@ def make_video_ffmpeg(save_dir, video_name, files=[], fps=10, smooth=True):
     open(txt_name, 'w').write('\n'.join(["file '" + os.path.join(path, f) + "'" for f in files]))
 
     # -vf "tblend=average,framestep=1,setpts=0.50*PTS"
-    subprocess.call(' '.join([
-        f'{ff_path} -y',
-        f'-r {fps}',
-        '-f concat -safe 0',
-        f'-i "{txt_name}"',
-        '-vcodec libx264',
-        '-filter:v minterpolate' if smooth else '',   # smooth between images
-        '-crf 10',
-        '-pix_fmt yuv420p',
-        f'"{video_name}"'
-    ]))
+    ffmpeg_command = ["ffmpeg", "-r", str(fps), "-f", "concat", "-safe", "0", "-i", str(txt_name), "-vcodec", "libx264", "-filter:v", "minterpolate", "-crf", "10", "-pix_fmt", "yuv420p", str(video_name)]
+    
+    subprocess.call(ffmpeg_command)
+    
     return video_name
 
 
 def play_video_ffmpeg(video_path):
-    ff_path = find_ff('play')
-    subprocess.Popen(
-        f'''{ff_path} "{video_path}"'''
-    )
+    ffplay_command = ["ffplay", str(video_path)]
+    subprocess.call(ffplay_command)
+    
